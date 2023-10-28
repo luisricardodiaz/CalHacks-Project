@@ -88,6 +88,7 @@ function App() {
             }}
           />
         </div>
+        
         <div className={`GeneratePlaylistButton ${isLoading ? 'loading' : ''}`}>
           <Button onClick={handleGeneratePlaylistClick}>Generate Playlist</Button>
         </div>
