@@ -13,8 +13,12 @@ function App() {
   const ideas = useQuery(api.myFunctions.listIdeas)
   const saveIdea = useMutation(api.myFunctions.saveIdea)
   const generateIdea = useAction(api.myFunctions.fetchRandomIdea)
+
+  const morningSongs = useQuery(api.morningSongs.get);
+  const daySongs = useQuery(api.daySongs.get);
   const nightSongs = useQuery(api.nightSongs.get);
-  console.log(nightSongs);
+
+  
 
   return (
     <>
