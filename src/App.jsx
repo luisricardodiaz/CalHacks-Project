@@ -10,7 +10,6 @@ function App() {
   useEffect(() => {
     async function asyncWrapper() {
       if (imageUploaded == false) {
-        console.log("please")
         return
       }
       // React.StrictMode in main.jsx makes this code run twice
@@ -66,21 +65,47 @@ function App() {
       
       console.log(scenesOutput)
       console.log(timeOutput)
+      console.log(labelToSongs)
+
+      // the 0th item in the output is the highest match
+      const highestTimeMatch = timeOutput[0].label
+      
+      console.log(highestTimeMatch)
+      const playlistOptions = Array.from(labelToSongs[highestTimeMatch])
+      console.log(playlistOptions)
+
+      function getPlaylist(playlistOptions) {
+        var itemsPicked = 0
+        var playlist = [];
+        // need to sample without replacement. this code randomly chooses one item from playlistOptions, adds it to the playlist,
+        // and removes it from playlistOptions
+        while (itemsPicked < 12) {
+          var index = Math.floor(Math.random() * playlistOptions.length);
+          var item = playlistOptions[index]
+          playlist.push(item)
+          playlistOptions.splice(index, 1)
+          itemsPicked += 1
+        }
+        return playlist
+      }
+
+      const playlist = getPlaylist(playlistOptions)
+      console.log(playlist)
     }
-    asyncWrapper().then(() => {}).catch((error) => console.log("FAILED: " + error))
+    asyncWrapper().then(() => {}).catch((error) => console.log("asyncwrapper FAILED: " + error))
   }, [imageUploaded, imageUrl]);
-
-  const [newIdea, setNewIdea] = useState("")
-  const [includeRandom, setIncludeRandom] = useState(true)
-  const [selectedImage, setSelectedImage] = useState(null)
-
-  const ideas = useQuery(api.myFunctions.listIdeas)
-  const saveIdea = useMutation(api.myFunctions.saveIdea)
-  const generateIdea = useAction(api.myFunctions.fetchRandomIdea)
 
   const morningSongs = useQuery(api.morningSongs.get);
   const daySongs = useQuery(api.daySongs.get);
   const nightSongs = useQuery(api.nightSongs.get);
+
+  // three labels: Sunrise, Daytime, Nighttime
+  // TODO: these labels are undefined at first, I'm not sure why
+  const labelToSongs = {
+    "Sunrise" : morningSongs,
+    "Daytime" : daySongs,
+    "Nighttime" : nightSongs
+  }
 
   return (
     <>
@@ -97,9 +122,7 @@ function App() {
 
       <input type='file' name='image' onChange={(e) => {
         console.log(e.target.files[0])
-        setSelectedImage(e.target.files[0])
         const imageUrl = URL.createObjectURL(e.target.files[0])
-        console.log("ImageURL: " + imageUrl)
         setImageUrl(imageUrl)
         setImageUploaded(true)
       }}/>
