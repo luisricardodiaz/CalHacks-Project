@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import React, { useEffect, useRef, useState } from 'react';
 import ImageSlider from './ImageSlider';
 import { Waveform } from '@uiball/loaders';
+import SpotifyPlaylist from "./components/SpotifyPlaylist";
 
 const images = ['src/assets/image1.jpeg', 'src/assets/image2.jpeg', 'src/assets/image3.jpeg', 'src/assets/image4.jpeg', 'src/assets/image5.jpeg', 'src/assets/image6.jpeg', 'src/assets/image7.jpeg', 'src/assets/image8.jpeg', 'src/assets/image9.jpeg', 'src/assets/image10.jpeg', 'src/assets/image11.jpeg']
 
@@ -23,7 +24,7 @@ function App() {
       }
       // React.StrictMode in main.jsx makes this code run twice
       async function scenesQuery(filename) {
-        const data = await (await fetch(filename)).arrayBuffer()
+        const data = await (await fetch(filename)).arrayBuffer() // hack to make image compatible with jsx
         const response = await fetch(
           "https://api-inference.huggingface.co/models/jmillan736/BEiT-Scenes",
           {
@@ -40,7 +41,7 @@ function App() {
       }
 
       async function timeQuery(filename) {
-        const data = await (await fetch(filename)).arrayBuffer()
+        const data = await (await fetch(filename)).arrayBuffer() // hack to make image compatible with jsx
         const response = await fetch(
           "https://api-inference.huggingface.co/models/jmillan736/BEiT-Time-Of-Day",
           {
@@ -64,24 +65,18 @@ function App() {
           const answer = await query(imageUrl)
           return answer;
         } catch (error) {
-          setTimeout(() => {console.log(error + " Retrying...")}, 1000)
+          setTimeout(() => {console.log(error + " Retrying...")}, 5000)
           await callQuery(maxRetries + 1, query)
         }
       }
 
       const scenesOutput = await callQuery(0, scenesQuery);
       const timeOutput = await callQuery(0, timeQuery);
-      
-      console.log(scenesOutput)
-      console.log(timeOutput)
-      console.log(labelToSongs)
 
       // the 0th item in the output is the highest match
       const highestTimeMatch = timeOutput[0].label
       
-      console.log(highestTimeMatch)
       const playlistOptions = Array.from(labelToSongs[highestTimeMatch])
-      console.log(playlistOptions)
 
       function getPlaylist(playlistOptions) {
         var itemsPicked = 0
@@ -98,11 +93,14 @@ function App() {
         return playlist
       }
 
-      const playlist = getPlaylist(playlistOptions)
-      console.log(playlist)
+      const result = getPlaylist(playlistOptions)
+      console.log(result)
+      setPlaylist(result)
     }
     asyncWrapper().then(() => {}).catch((error) => console.log("asyncwrapper FAILED: " + error))
   }, [imageUploaded, imageUrl]);
+
+  const [playlist, setPlaylist] = useState(null) 
 
   const morningSongs = useQuery(api.morningSongs.get);
   const daySongs = useQuery(api.daySongs.get);
@@ -197,6 +195,7 @@ function App() {
             color= {isLightMode ? 'black' : 'white'}
           />
         </div>
+        <SpotifyPlaylist playlistArray={playlist}/>
       </div>
     </>
   );
