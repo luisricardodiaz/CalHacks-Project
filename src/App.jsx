@@ -176,7 +176,7 @@ function App() {
           <button class="btn1">{imageUploaded ?  imageName: "Upload a file"}</button>
           <input type='file' name='image' onChange={(e) => {
           console.log(e.target.files[0])
-          const imageUrl = URL.createObjectURL(e.target.files[0])
+          const imageUrl = URL.createObjectURL(e.target.files[0]) 
           setImageUrl(imageUrl)
           setImageName(e.target.files[0]['name'])
           setImageUploaded(true)
