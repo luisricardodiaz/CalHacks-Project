@@ -45,6 +45,56 @@
     color: var(--convex-yellow);
   }
 
+  .title{
+    margin-left: 1%;
+  }
+
+  .dragPicture{
+    margin: 3%;
+  }
+
+  .GeneratePlaylistButton{
+    display: flex;
+    justify-content: center;
+    margin: 2%;
+    padding: 0.7%;
+    border-radius: 5%;
+    border-left: 0% !important;
+    max-width: 30% ;
+    margin: auto;
+    border-right: 0%;
+    margin-bottom: 2%;
+
+  }
+
+  .loadingPlaylistAnimation{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+  }
+
+  .loadingPlaylistAnimation.hide{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+    visibility: hidden;
+  }
+
+  .loadingPlaylistAnimation.show.black{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+    color: black;
+  }
+
+  .loadingPlaylistAnimation.show.white{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+    color: white;
+  }
+
+
   .convex-yellow {
     color: var(--convex-yellow);
   }
