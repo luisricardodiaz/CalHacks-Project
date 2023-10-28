@@ -15,7 +15,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as myFunctions from "../myFunctions";
-import type * as tasts from "../tasts";
+import type * as tasks from "../tasks";
 import type * as _schema from "../_schema";
 
 /**
@@ -28,7 +28,7 @@ import type * as _schema from "../_schema";
  */
 declare const fullApi: ApiFromModules<{
   myFunctions: typeof myFunctions;
-  tasts: typeof tasts;
+  tasks: typeof tasks;
   _schema: typeof _schema;
 }>;
 export declare const api: FilterApi<
