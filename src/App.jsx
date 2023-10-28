@@ -1,4 +1,4 @@
-import { useAction, useMutation, useQuery } from "convex/react"
+import { useQuery } from "convex/react"
 import { api } from "../convex/_generated/api";
 import { Button } from "react-bootstrap";
 import React, { useEffect, useRef, useState } from 'react';
@@ -9,10 +9,6 @@ const images = ['src/assets/image1.jpeg', 'src/assets/image2.jpeg', 'src/assets/
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
-  const saveStorageId = useMutation(api.files.saveStorageId);
-  const waveRef = useRef(null);
-  
   const [imageUploaded, setImageUploaded] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
 
@@ -116,9 +112,6 @@ function App() {
     "Nighttime" : nightSongs
   }
 
-  const saveAfterUpload = async (uploaded) => {
-    await saveStorageId({ storageId: (uploaded[0].response).storageId });
-  };
 
   const handleGeneratePlaylistClick = async () => {
 
@@ -202,5 +195,4 @@ function App() {
   );
 }
 
-// console.log(isLightMode)
 export default App;
