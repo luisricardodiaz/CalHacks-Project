@@ -94,6 +94,50 @@
     color: white;
   }
 
+  .upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    margin: 3%;
+  }
+  
+  .btn1 {
+    border: 2px dashed; /* Change from solid to dashed*/
+    background-color: transparent;
+    padding: 7% 40%;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .btn2 {
+    border: 2px solid; /* Change from solid to dashed */
+    
+    background-color: transparent;
+    padding: 7% 10%;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s; /* Add a smooth transition */
+  
+    /* Add hover styles */
+  }
+  .btn2:hover {
+    background-color: #1DB954; /* Change to the desired color on hover */
+  }
+  
+
+  
+  .upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+  }
+  
+
 
   .convex-yellow {
     color: var(--convex-yellow);

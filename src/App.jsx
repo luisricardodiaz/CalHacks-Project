@@ -11,7 +11,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploaded, setImageUploaded] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
-
+  const [imageName, setImageName] = useState("")
   useEffect(() => {
     async function asyncWrapper() {
       if (imageUploaded == false) {
@@ -172,14 +172,17 @@ function App() {
             <span className="text-4xl font-bold" style={{ color: '#1D3557' }}>S</span>
           </h1>
         </div>
-        <input type='file' name='image' onChange={(e) => {
-        console.log(e.target.files[0])
-        const imageUrl = URL.createObjectURL(e.target.files[0])
-        setImageUrl(imageUrl)
-        setImageUploaded(true)
-        }}/>
+        <div className="upload-btn-wrapper" color={isLightMode ? 'black' : 'white'}> 
+          <button class="btn1">{imageUploaded ?  imageName: "Upload a file"}</button>
+          <input type='file' name='image' onChange={(e) => {
+          console.log(e.target.files[0])
+          const imageUrl = URL.createObjectURL(e.target.files[0])
+          setImageUrl(imageUrl)
+          setImageName(e.target.files[0]['name'])
+          setImageUploaded(true)
+          }}/> </div>
         <div className={`GeneratePlaylistButton ${isLoading ? 'loading' : ''}`}>
-          <Button onClick={handleGeneratePlaylistClick}>Generate Playlist</Button>
+          <Button className = "btn2" color={isLightMode ? 'black' : 'white'} onClick={handleGeneratePlaylistClick}>Generate Playlist</Button>
         </div>
         <div className={`loadingPlaylistAnimation ${isLoading ? 'show' : 'hidden'}`}>
           <Waveform
