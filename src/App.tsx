@@ -13,6 +13,8 @@ function App() {
   const ideas = useQuery(api.myFunctions.listIdeas)
   const saveIdea = useMutation(api.myFunctions.saveIdea)
   const generateIdea = useAction(api.myFunctions.fetchRandomIdea)
+  const nightSongs = useQuery(api.nightSongs.get);
+  console.log(nightSongs);
 
   return (
     <>
@@ -22,6 +24,12 @@ function App() {
         </h1>
 
         <h2 className="text-center">Let's brainstorm apps to build!</h2>
+
+        <div className="App">
+          {nightSongs?.map(({ _id, added_at}) => (
+            <div key={_id}>{added_at}</div>
+          ))}
+        </div>
 
         <div className="flex gap-2">
           <Input
