@@ -1,9 +1,7 @@
 import { useAction, useMutation, useQuery } from "convex/react"
-import { UploadDropzone } from "@xixixao/uploadstuff/react";
-import "@xixixao/uploadstuff/react/styles.css";
 import { api } from "../convex/_generated/api";
 import { Button } from "react-bootstrap";
-import React, { useEffect, useRef, useState, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ImageSlider from './ImageSlider';
 import { Waveform } from '@uiball/loaders';
 
@@ -180,16 +178,6 @@ function App() {
             <span className="text-4xl font-bold" style={{ color: '#457B9D' }}>e</span>
             <span className="text-4xl font-bold" style={{ color: '#1D3557' }}>S</span>
           </h1>
-        </div>
-        <div className="dragPicture">
-          <UploadDropzone
-            uploadUrl={generateUploadUrl}
-            fileTypes={[".pdf", "image/*"]}
-            onClientUploadComplete={saveAfterUpload}
-            onUploadError={(error) => {
-              alert(`ERROR! ${error}`);
-            }}
-          />
         </div>
         <input type='file' name='image' onChange={(e) => {
         console.log(e.target.files[0])
