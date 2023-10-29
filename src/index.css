@@ -41,9 +41,112 @@
     font-size: 22px;
   }
 
-  a {
-    color: var(--convex-yellow);
+  .white-title {
+    padding-left: 1%;
+    padding-top: 1%;
+    padding-bottom: 1%;
   }
+
+  .color-title {
+    padding: 1%
+  }
+
+  .dragPicture{
+    margin: 3%;
+  }
+
+  .GeneratePlaylistButton{
+    display: flex;
+    justify-content: center;
+    margin: 2%;
+    padding: 0.7%;
+    border-radius: 5%;
+    border-left: 0% !important;
+    max-width: 30% ;
+    margin: auto;
+    border-right: 0%;
+    margin-bottom: 2%;
+
+  }
+
+  .loadingPlaylistAnimation{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+  }
+
+  .loadingPlaylistAnimation.hide{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+    visibility: hidden;
+  }
+
+  .loadingPlaylistAnimation.show.black{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+    color: black;
+  }
+
+  .loadingPlaylistAnimation.show.white{
+    display: flex;
+    justify-content: center;
+    margin: 10%;
+    color: white;
+  }
+
+  .upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    margin: 3%;
+  }
+  
+  .btn1 {
+    border: 2px dashed; /* Change from solid to dashed*/
+    background-color: transparent;
+    padding: 7% 40%;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .btn2 {
+    border: 2px solid; /* Change from solid to dashed */
+    
+    background-color: transparent;
+    padding: 7% 10%;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s; /* Add a smooth transition */
+  
+    /* Add hover styles */
+  }
+  .btn2:hover {
+    background-color: #1DB954; /* Change to the desired color on hover */
+  }
+  
+  .top-bar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    z-index: 10;
+  }
+
+
+  .upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+  }
+  
+
 
   .convex-yellow {
     color: var(--convex-yellow);
@@ -108,3 +211,47 @@
     @apply bg-background text-foreground;
   }
 }
+
+.animate-character
+{
+  background-image: linear-gradient(
+  -225deg,
+  #ff0000 0%,
+  #f6ff00 29%,
+  #13ff46 67%,
+  #0084ff 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+  padding-left: 10px;
+}
+
+
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.spotify-login {
+  border: 2px solid;
+  border-radius: 8px;
+  font-size: large;
+  text-align: center;
+  padding: 10px;
+  transition: background-color 0.3s;
+}
+
+.spotify-login:hover {
+  background-color: #1DB954;
+}
+  
+

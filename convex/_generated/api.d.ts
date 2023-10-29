@@ -15,7 +15,14 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as _schema from "../_schema";
+import type * as checkIfExists from "../checkIfExists";
+import type * as daySongs from "../daySongs";
+import type * as files from "../files";
+import type * as morningSongs from "../morningSongs";
 import type * as myFunctions from "../myFunctions";
+import type * as mySongs from "../mySongs";
+import type * as nightSongs from "../nightSongs";
+import type * as tasks from "../tasks";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -27,7 +34,14 @@ import type * as myFunctions from "../myFunctions";
  */
 declare const fullApi: ApiFromModules<{
   _schema: typeof _schema;
+  checkIfExists: typeof checkIfExists;
+  daySongs: typeof daySongs;
+  files: typeof files;
+  morningSongs: typeof morningSongs;
   myFunctions: typeof myFunctions;
+  mySongs: typeof mySongs;
+  nightSongs: typeof nightSongs;
+  tasks: typeof tasks;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
