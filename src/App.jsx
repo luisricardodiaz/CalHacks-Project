@@ -25,151 +25,97 @@ function App() {
   const [imageUploaded, setImageUploaded] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
   const [imageName, setImageName] = useState("")
+
+
   useEffect(() => {
-  
-    async function asyncWrapper() {
-      if (imageUploaded == false) {
-        return
-      }
-      // React.StrictMode in main.jsx makes this code run twice
-      async function scenesQuery(filename) {
-        const data = await (await fetch(filename)).arrayBuffer()
-        const response = await fetch(
-          "https://api-inference.huggingface.co/models/jmillan736/BEiT-Scenes",
-          {
-            headers: {Authorization: `Bearer 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`},
-            method: "POST",
-            body: data,
-          }
-        );
-        const result = await response.json();
-        if ("error" in result) {
-          throw new Error("API Call failed! " + result.error);
-        }
-        return result;
-      }
-      
-      const hash = window.location.hash;
-    let token = window.localStorage.getItem("token");
+        async function asyncWrapper() {
+          if (imageUploaded == false) {
+            return
+          }
+          // React.StrictMode in main.jsx makes this code run twice
+          async function scenesQuery(filename) {
+            const data = await (await fetch(filename)).arrayBuffer()
+            const response = await fetch(
+              "https://api-inference.huggingface.co/models/jmillan736/BEiT-Scenes",
+              {
+                headers: {Authorization: `Bearer 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`},
+                method: "POST",
+                body: data,
+              }
+            );
+            const result = await response.json();
+            if ("error" in result) {
+              throw new Error("API Call failed! " + result.error);
+            }
+            return result;
+          }
+    
+          async function timeQuery(filename) {
+            const data = await (await fetch(filename)).arrayBuffer()
+            const response = await fetch(
+              "https://api-inference.huggingface.co/models/jmillan736/BEiT-Time-Of-Day",
+              {
+                headers: {Authorization: `Bearer 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`},
+                method: "POST",
+                body: data,
+              }
+            );
+            const result = await response.json();
+            if ("error" in result) {
+              throw new Error("API Call failed! " + result.error);
+            }
+            return result;
+          }
+          
+          async function callQuery(maxRetries, query) {
+            if (maxRetries > 5) {
+              throw new Error("Maximum number of API Calls exceeded");
+            }
+            try {
+              const answer = await query(imageUrl)
+              return answer;
+            } catch (error) {
+              setTimeout(() => {console.log(error + " Retrying...")}, 1000)
+              await callQuery(maxRetries + 1, query)
+            }
+          }
+    
+          const scenesOutput = await callQuery(0, scenesQuery);
+          const timeOutput = await callQuery(0, timeQuery);
+          
+          console.log(scenesOutput)
+          console.log(timeOutput)
+          console.log(labelToSongs)
+    
+          // the 0th item in the output is the highest match
+          const highestTimeMatch = timeOutput[0].label
+          
+          console.log(highestTimeMatch)
+          const playlistOptions = Array.from(labelToSongs[highestTimeMatch])
+          console.log(playlistOptions)
+    
+          function getPlaylist(playlistOptions) {
+            var itemsPicked = 0
+            var playlist = [];
+            // need to sample without replacement. this code randomly chooses one item from playlistOptions, adds it to the playlist,
+            // and removes it from playlistOptions
+            while (itemsPicked < 12) {
+              var index = Math.floor(Math.random() * playlistOptions.length);
+              var item = playlistOptions[index]
+              playlist.push(item)
+              playlistOptions.splice(index, 1)
+              itemsPicked += 1
+            }
+            return playlist
+          }
+    
+          const playlist = getPlaylist(playlistOptions)
+          console.log(playlist)
+        }
+        asyncWrapper().then(() => {}).catch((error) => console.log("asyncwrapper FAILED: " + error))
+      }, [imageUploaded, imageUrl]);
 
-    if (!token && hash) {
-      token = hash
-        .substring(1)
-        .split("&")
-        .find((elem) => elem.startsWith("access_token"))
-        .split("=")[1];
-
-      window.location.hash = "";
-      window.localStorage.setItem("token", token);
-    }
-
-    setToken(token);
-  }, []);
-
-  const logout = () => {
-    setToken("");
-    window.localStorage.removeItem("token");
-  };
-
-  const renderPlaylistSongs = (tracks, environment, timeOfDay) => {
-    tracks.map((track) => {
-      mutatePlaylist({ environment: environment, time_of_day: timeOfDay, added_at: track.added_at, added_by: track.added_by, is_local: track.is_local, primary_color: track.primary_color, track: track.track, video_thumbnail: track.video_thumbnail })
-    });
-  }
-
-  const searchTracks = async (apiEndpoint, environment, timeOfDay) => {
-    const { data } = await axios.get(apiEndpoint, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    renderPlaylistSongs(data.tracks.items, environment, timeOfDay)
-  }
-
-  const searchPlaylist = async (e) => {
-    e.preventDefault();
-    for (const environment in playlistToVibe) {
-      for (const timeOfDay in playlistToVibe[environment]) {
-        console.log(playlistToVibe[environment][timeOfDay])
-        const { data } = await axios.get("https://api.spotify.com/v1/search", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            q: playlistToVibe[environment][timeOfDay],
-            type: "playlist",
-          },
-        });
-        searchTracks(data.playlists.items[0].href, environment, timeOfDay);
-      }
-    }
-
-      async function timeQuery(filename) {
-        const data = await (await fetch(filename)).arrayBuffer()
-        const response = await fetch(
-          "https://api-inference.huggingface.co/models/jmillan736/BEiT-Time-Of-Day",
-          {
-            headers: {Authorization: `Bearer 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`},
-            method: "POST",
-            body: data,
-          }
-        );
-        const result = await response.json();
-        if ("error" in result) {
-          throw new Error("API Call failed! " + result.error);
-        }
-        return result;
-      }
-      
-      async function callQuery(maxRetries, query) {
-        if (maxRetries > 5) {
-          throw new Error("Maximum number of API Calls exceeded");
-        }
-        try {
-          const answer = await query(imageUrl)
-          return answer;
-        } catch (error) {
-          setTimeout(() => {console.log(error + " Retrying...")}, 1000)
-          await callQuery(maxRetries + 1, query)
-        }
-      }
-
-      const scenesOutput = await callQuery(0, scenesQuery);
-      const timeOutput = await callQuery(0, timeQuery);
-      
-      console.log(scenesOutput)
-      console.log(timeOutput)
-      console.log(labelToSongs)
-
-      // the 0th item in the output is the highest match
-      const highestTimeMatch = timeOutput[0].label
-      
-      console.log(highestTimeMatch)
-      const playlistOptions = Array.from(labelToSongs[highestTimeMatch])
-      console.log(playlistOptions)
-
-      function getPlaylist(playlistOptions) {
-        var itemsPicked = 0
-        var playlist = [];
-        // need to sample without replacement. this code randomly chooses one item from playlistOptions, adds it to the playlist,
-        // and removes it from playlistOptions
-        while (itemsPicked < 12) {
-          var index = Math.floor(Math.random() * playlistOptions.length);
-          var item = playlistOptions[index]
-          playlist.push(item)
-          playlistOptions.splice(index, 1)
-          itemsPicked += 1
-        }
-        return playlist
-      }
-
-      const playlist = getPlaylist(playlistOptions)
-      console.log(playlist)
-    }
-    asyncWrapper().then(() => {}).catch((error) => console.log("asyncwrapper FAILED: " + error))
-  }, [imageUploaded, imageUrl]);
-
-  const morningSongs = useQuery(api.morningSongs.get);
+    const morningSongs = useQuery(api.morningSongs.get);
   const daySongs = useQuery(api.daySongs.get);
   const nightSongs = useQuery(api.nightSongs.get);
 
@@ -183,20 +129,6 @@ function App() {
 
 
   const handleGeneratePlaylistClick = async () => {
-
-    setIsLoading(prev => !prev);
-
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: 'smooth',
-    });
-
-    // Simulate an asynchronous operation (e.g., generating a playlist)
-    await saveAfterUpload([]); // Replace this with your actual logic
-
-    setIsLoading(false);
   };
 
   function isBackgroundColorWhite(element) {
@@ -225,6 +157,64 @@ function App() {
   const element = document.querySelector('body'); // Replace with your element selector
   const isLightMode = isBackgroundColorWhite(element);
   let shuffleimage = shuffleArray(images);
+
+
+    useEffect(() => {
+    const hash = window.location.hash;
+    let token = window.localStorage.getItem("token");
+
+    if (!token && hash) {
+      token = hash
+        .substring(1)
+        .split("&")
+        .find((elem) => elem.startsWith("access_token"))
+        .split("=")[1];
+
+      window.location.hash = "";
+      window.localStorage.setItem("token", token);
+    }
+
+    setToken(token);
+  }, []);
+
+  const logout = () => {
+        setToken("");
+        window.localStorage.removeItem("token");
+      };
+    
+      const renderPlaylistSongs = (tracks, environment, timeOfDay) => {
+        tracks.map((track) => {
+          mutatePlaylist({ environment: environment, time_of_day: timeOfDay, added_at: track.added_at, added_by: track.added_by, is_local: track.is_local, primary_color: track.primary_color, track: track.track, video_thumbnail: track.video_thumbnail })
+        });
+      }
+    
+      const searchTracks = async (apiEndpoint, environment, timeOfDay) => {
+        const { data } = await axios.get(apiEndpoint, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        renderPlaylistSongs(data.tracks.items, environment, timeOfDay)
+      }
+    
+      const searchPlaylist = async (e) => {
+        e.preventDefault();
+        for (const environment in playlistToVibe) {
+          for (const timeOfDay in playlistToVibe[environment]) {
+            console.log(playlistToVibe[environment][timeOfDay])
+            const { data } = await axios.get("https://api.spotify.com/v1/search", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              params: {
+                q: playlistToVibe[environment][timeOfDay],
+                type: "playlist",
+              },
+            });
+            searchTracks(data.playlists.items[0].href, environment, timeOfDay);
+          }
+        }
+      };
 
   return (
     <>
