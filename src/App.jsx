@@ -299,7 +299,7 @@ function App() {
           className="upload-btn-wrapper"
           color={isLightMode ? "black" : "white"}
         >
-          <button class="btn1">
+          <button className="btn1">
             {imageUploaded ? imageName : "Upload a file"}
           </button>
           <input
