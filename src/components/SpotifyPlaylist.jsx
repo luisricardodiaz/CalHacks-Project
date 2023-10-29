@@ -69,7 +69,7 @@ function getArtists(artistArray) {
 function getPlaylist(playlistOptions) {
   var itemsPicked = 0;
   var playlist = []; // need to sample without replacement. this code randomly chooses one item from playlistOptions, adds it to the playlist, // and removes it from playlistOptions
-  while (itemsPicked < 12) {
+  while (itemsPicked < 20) {
     var index = Math.floor(Math.random() * playlistOptions.length);
     var item = playlistOptions[index];
     playlist.push(item);

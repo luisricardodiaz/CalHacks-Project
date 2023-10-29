@@ -60,6 +60,7 @@ function App() {
   const [playlistOptions, setPlaylistOptions] = useState([])
   const [timeOfDayLabel, setTimeOfDayLabel] = useState("")
   const [environmentLabel, setEnvironmentLabel] = useState("")
+  const [populatedDatabase, setPopulatedDatabase] = useState(false)
 
   const dataBasePopulatedHook = useQuery(api.checkIfExists.get, {tableName: uniqueId})
   console.log("type of database before: " + (typeof dataBasePopulatedHook))
@@ -76,6 +77,8 @@ function App() {
     if (imageUrl == "") {
       alert("No image found! Did you upload an image?")
     }
+    setIsLoading(true);
+
     async function scenesQuery(filename) {
       const data = await (await fetch(filename)).arrayBuffer();
       const response = await fetch(
@@ -116,6 +119,7 @@ function App() {
 
     async function callQuery(maxRetries, query) {
       if (maxRetries > 5) {
+        setIsLoading(false);
         alert("API Call failed, please try again")
         throw new Error("Maximum number of API Calls exceeded");
       }
@@ -138,6 +142,7 @@ function App() {
 
     setTimeOfDayLabel(timeOfDay[0].label);
     setEnvironmentLabel(environment[0].label);
+    setIsLoading(false);
   };
 
   function isBackgroundColorWhite(element) {
@@ -194,13 +199,15 @@ function App() {
         .then((randomString) => {
           const randStr = "s" + randomString
           setUniqueId(randStr);
-          // console.log("type of database before population: " + (typeof dataBasePopulatedHook))
-          // console.log("databaseHook length" + dataBasePopulatedHook.length)
-          // console.log("database condition: " + (dataBasePopulatedHook.length == 0))
-          searchPlaylist(token, randStr);
-          // if (dataBasePopulatedHook != undefined && dataBasePopulatedHook.length == 0) {
-          //   console.log("Creating database!")
-          // }
+          console.log("type of database before population: " + (typeof dataBasePopulatedHook))
+          console.log("databaseHook length" + dataBasePopulatedHook.length)
+          console.log("database condition: " + (dataBasePopulatedHook.length == 0))
+          console.log("database populated flag: " + populatedDatabase)
+          if (dataBasePopulatedHook != undefined && dataBasePopulatedHook.length == 0 && !populatedDatabase) {
+            console.log("Creating database!")
+            searchPlaylist(token, randStr);
+            setPopulatedDatabase(true)
+          }
         })
   
         .catch((error) => {
@@ -272,13 +279,11 @@ function App() {
           </div>
         </div>
         {!token ? (
-          <a
-            href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
-          >
-            Login to Spotify
-          </a>
+        <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`} className="spotify-login">
+        Login to Spotify
+        </a>
         ) : (
-          <button onClick={logout}>Logout</button>
+        <button className='spotify-login' onClick={logout}>Logout</button>
         )}
       </div>
       <div className="App">
@@ -348,6 +353,7 @@ function App() {
             lineWeight={3.5}
             speed={1}
             color={isLightMode ? "black" : "white"}
+
           />
         </div>
         <SpotifyPlaylist tableName={uniqueId}
