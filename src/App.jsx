@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ImageSlider from "./ImageSlider";
 import { Waveform } from "@uiball/loaders";
 import SpotifyPlaylist from "./components/SpotifyPlaylist";
+import { data } from "autoprefixer";
 
 const images = [
   "src/assets/image1.jpeg",
@@ -59,6 +60,9 @@ function App() {
   const [playlistOptions, setPlaylistOptions] = useState([])
   const [timeOfDayLabel, setTimeOfDayLabel] = useState("")
   const [environmentLabel, setEnvironmentLabel] = useState("")
+
+  const dataBasePopulatedHook = useQuery(api.checkIfExists.get, {tableName: uniqueId})
+  console.log("type of database before: " + (typeof dataBasePopulatedHook))
 
   // three labels: Sunrise, Daytime, Nighttime
   // TODO: these labels are undefined at first, I'm not sure why
@@ -160,18 +164,6 @@ function App() {
   let shuffleimage = shuffleArray(images);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    let token = window.localStorage.getItem("token");
-    if (!token && hash) {
-      token = hash
-        .substring(1)
-        .split("&")
-        .find((elem) => elem.startsWith("access_token"))
-        .split("=")[1];
-      window.location.hash = "";
-      window.localStorage.setItem("token", token);
-    }
-
     function generateRandomString(secret, length) {
       const encoder = new TextEncoder();
       const data = encoder.encode(secret);
@@ -184,21 +176,39 @@ function App() {
       });
     }
 
+    const hash = window.location.hash;
+    let token = window.localStorage.getItem("token");
+    if (!token && hash) {
+      token = hash
+        .substring(1)
+        .split("&")
+        .find((elem) => elem.startsWith("access_token"))
+        .split("=")[1];
+      window.location.hash = "";
+      window.localStorage.setItem("token", token);  
+    }
+
     const secretString = token;
-
     const length = 31;
-
     generateRandomString(secretString, length)
-      .then((randomString) => {
-        setUniqueId("s" + randomString);
-      })
-
-      .catch((error) => {
-        console.error(error);
-      });
+        .then((randomString) => {
+          const randStr = "s" + randomString
+          setUniqueId(randStr);
+          // console.log("type of database before population: " + (typeof dataBasePopulatedHook))
+          // console.log("databaseHook length" + dataBasePopulatedHook.length)
+          // console.log("database condition: " + (dataBasePopulatedHook.length == 0))
+          searchPlaylist(token, randStr);
+          // if (dataBasePopulatedHook != undefined && dataBasePopulatedHook.length == 0) {
+          //   console.log("Creating database!")
+          // }
+        })
+  
+        .catch((error) => {
+          console.error(error);
+        });
 
     setToken(token);
-  }, []);
+  }, [dataBasePopulatedHook]);
 
   const logout = () => {
     setToken("");
@@ -206,10 +216,10 @@ function App() {
     window.localStorage.removeItem("token");
   };
 
-  const renderPlaylistSongs = (tracks, environment, timeOfDay) => {
+  const renderPlaylistSongs = (tracks, environment, timeOfDay, tableId) => {
     tracks.map((track) => {
       mutatePlaylist({
-        unique_id: uniqueId,
+        unique_id: tableId,
         environment: environment,
         time_of_day: timeOfDay,
         added_at: track.added_at,
@@ -222,19 +232,17 @@ function App() {
     });
   };
 
-  const searchTracks = async (apiEndpoint, environment, timeOfDay) => {
+  const searchTracks = async (apiEndpoint, environment, timeOfDay, token, tableId) => {
     const { data } = await axios.get(apiEndpoint, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    renderPlaylistSongs(data.tracks.items, environment, timeOfDay);
+    renderPlaylistSongs(data.tracks.items, environment, timeOfDay, tableId);
   };
 
-  const searchPlaylist = async (e) => {
-    e.preventDefault();
-
+  const searchPlaylist = async (token, tableId) => {
     for (const environment in playlistToVibe) {
       for (const timeOfDay in playlistToVibe[environment]) {
         console.log(playlistToVibe[environment][timeOfDay]);
@@ -250,7 +258,7 @@ function App() {
             type: "playlist",
           },
         });
-        searchTracks(data.playlists.items[0].href, environment, timeOfDay);
+        searchTracks(data.playlists.items[0].href, environment, timeOfDay, token, tableId);
       }
     }
   };
@@ -258,7 +266,11 @@ function App() {
   return (
     <>
       <div className="top-bar">
-        <h1 className="title"> VibeS</h1>
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="animate-character">VibeS</h3>
+          </div>
+        </div>
         {!token ? (
           <a
             href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
@@ -272,29 +284,29 @@ function App() {
       <div className="App">
         <ImageSlider images={shuffleimage} />
         <div className="absolute top-0 left-0 w-full h-screen flex items-center justify-center text-white -z-10">
-          <h1 className="text-4xl font-bold "> Make a playlist for any </h1>
-          <h1 className="title">
-            <span className="text-4xl font-bold" style={{ color: "#E63946" }}>
-              V
-            </span>
-            <span className="text-4xl font-bold" style={{ color: "#FFD700" }}>
-              i
-            </span>
-            <span className="text-4xl font-bold" style={{ color: "#228B22" }}>
-              b
-            </span>
-            <span className="text-4xl font-bold" style={{ color: "#457B9D" }}>
-              e
-            </span>
-            <span className="text-4xl font-bold" style={{ color: "#1D3557" }}>
-              S
-            </span>
-          </h1>
+            <h1 className="text-4xl font-bold bg-black white-title"> Make a playlist for any</h1>
+            <h1 className="bg-black color-title">
+              <span className="text-4xl font-bold" style={{ color: "#E63946" }}>
+                V
+              </span>
+              <span className="text-4xl font-bold" style={{ color: "#FFD700" }}>
+                i
+              </span>
+              <span className="text-4xl font-bold" style={{ color: "#228B22" }}>
+                b
+              </span>
+              <span className="text-4xl font-bold" style={{ color: "#457B9D" }}>
+                e
+              </span>
+              <span className="text-4xl font-bold" style={{ color: "#1D3557" }}>
+                S
+              </span>
+            </h1>
         </div>
-        <form onSubmit={searchPlaylist}>
-          {/* <input type="text" onChange={(e) => setSearchKey(e.target.value)} /> */}
+        {/* <form onSubmit={searchPlaylist}>
+          <input type="text" onChange={(e) => setSearchKey(e.target.value)} />
           <button type={"submit"}>Begin Table Population</button>
-        </form>
+        </form> */}
         <div
           className="upload-btn-wrapper"
           color={isLightMode ? "black" : "white"}
@@ -311,6 +323,8 @@ function App() {
               setImageUrl(imageUrl);
               setImageName(e.target.files[0]["name"]);
               setImageUploaded(true);
+              setEnvironmentLabel("");
+              setTimeOfDayLabel("");
             }}
           />{" "}
         </div>

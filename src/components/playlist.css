@@ -1,0 +1,47 @@
+table {
+    padding: 10px;
+    width: 90%;
+}
+td {
+    padding: 10px;
+}
+th {
+    padding-left: 10px;
+}
+
+.playlist-container {
+    font-size: medium;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+.playlist-title {
+   font-size: x-large;
+   border-bottom: 2px solid;
+}
+.title-align {
+    text-align: left;
+}
+.title-artist {
+    display: flex;
+    flex-direction: column;
+}
+.title-artist li:first-child {
+    display: flex;
+    flex-direction: column;
+    font-size: medium;
+}
+
+ul li:first-child {
+    font-size: large;
+}
+
+tr th:first-child {
+    text-align: center;
+}
+tr th:last-child {
+    text-align: center;
+}
+.table-body tr:hover {
+    background-color: #95809c;
+}

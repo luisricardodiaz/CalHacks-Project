@@ -15,6 +15,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as _schema from "../_schema";
+import type * as checkIfExists from "../checkIfExists";
 import type * as daySongs from "../daySongs";
 import type * as files from "../files";
 import type * as morningSongs from "../morningSongs";
@@ -33,6 +34,7 @@ import type * as tasks from "../tasks";
  */
 declare const fullApi: ApiFromModules<{
   _schema: typeof _schema;
+  checkIfExists: typeof checkIfExists;
   daySongs: typeof daySongs;
   files: typeof files;
   morningSongs: typeof morningSongs;
