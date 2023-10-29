@@ -342,7 +342,7 @@ function App() {
             Generate Playlist
           </Button>
         </div>
-        <div
+        <div id="loading"
           className={`loadingPlaylistAnimation ${
             isLoading ? "show" : "hidden"
           }`}
