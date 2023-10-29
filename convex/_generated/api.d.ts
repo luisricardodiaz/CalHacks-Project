@@ -19,6 +19,7 @@ import type * as daySongs from "../daySongs";
 import type * as files from "../files";
 import type * as morningSongs from "../morningSongs";
 import type * as myFunctions from "../myFunctions";
+import type * as mySongs from "../mySongs";
 import type * as nightSongs from "../nightSongs";
 import type * as tasks from "../tasks";
 
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   morningSongs: typeof morningSongs;
   myFunctions: typeof myFunctions;
+  mySongs: typeof mySongs;
   nightSongs: typeof nightSongs;
   tasks: typeof tasks;
 }>;
