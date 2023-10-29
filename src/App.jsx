@@ -158,71 +158,195 @@ function App() {
   const isLightMode = isBackgroundColorWhite(element);
   let shuffleimage = shuffleArray(images);
 
+  useEffect(() => {
 
-    useEffect(() => {
-    const hash = window.location.hash;
-    let token = window.localStorage.getItem("token");
-
-    if (!token && hash) {
-      token = hash
-        .substring(1)
-        .split("&")
-        .find((elem) => elem.startsWith("access_token"))
-        .split("=")[1];
-
-      window.location.hash = "";
-      window.localStorage.setItem("token", token);
-    }
-
-    setToken(token);
-  }, []);
-
-  const logout = () => {
+        const hash = window.location.hash;
+    
+        let token = window.localStorage.getItem("token");
+    
+    
+    
+        if (!token && hash) {
+    
+          token = hash
+    
+            .substring(1)
+    
+            .split("&")
+    
+            .find((elem) => elem.startsWith("access_token"))
+    
+            .split("=")[1];
+    
+    
+    
+          window.location.hash = "";
+    
+          window.localStorage.setItem("token", token);
+    
+        }
+    
+    
+    
+        function generateRandomString(secret, length) {
+    
+          const encoder = new TextEncoder();
+    
+          const data = encoder.encode(secret);
+    
+          return window.crypto.subtle.digest("SHA-256", data).then((hashBuffer) => {
+    
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+    
+            const hashHex = hashArray
+    
+              .map((byte) => byte.toString(16).padStart(2, "0"))
+    
+              .join("");
+    
+            return hashHex.substr(0, length);
+    
+          });
+    
+        }
+    
+    
+    
+        const secretString = token;
+    
+        const length = 32;
+    
+    
+    
+        generateRandomString(secretString, length)
+    
+          .then((randomString) => {
+    
+            setUniqueId(randomString);
+    
+          })
+    
+          .catch((error) => {
+    
+            console.error(error);
+    
+          });
+    
+    
+    
+        setToken(token);
+    
+      }, []);
+    
+      const logout = () => {
+    
         setToken("");
+    
         window.localStorage.removeItem("token");
+    
       };
     
       const renderPlaylistSongs = (tracks, environment, timeOfDay) => {
+    
         tracks.map((track) => {
-          mutatePlaylist({ environment: environment, time_of_day: timeOfDay, added_at: track.added_at, added_by: track.added_by, is_local: track.is_local, primary_color: track.primary_color, track: track.track, video_thumbnail: track.video_thumbnail })
+    
+          mutatePlaylist({
+    
+            unique_id: uniqueId,
+    
+            environment: environment,
+    
+            time_of_day: timeOfDay,
+    
+            added_at: track.added_at,
+    
+            added_by: track.added_by,
+    
+            is_local: track.is_local,
+    
+            primary_color: track.primary_color,
+    
+            track: track.track,
+    
+            video_thumbnail: track.video_thumbnail,
+    
+          });
+    
         });
-      }
+    
+      };
     
       const searchTracks = async (apiEndpoint, environment, timeOfDay) => {
+    
         const { data } = await axios.get(apiEndpoint, {
+    
           headers: {
+    
             Authorization: `Bearer ${token}`,
+    
           },
-        })
-        renderPlaylistSongs(data.tracks.items, environment, timeOfDay)
-      }
+    
+        });
+    
+        renderPlaylistSongs(data.tracks.items, environment, timeOfDay);
+    
+      };
     
       const searchPlaylist = async (e) => {
+    
         e.preventDefault();
+    
         for (const environment in playlistToVibe) {
+    
           for (const timeOfDay in playlistToVibe[environment]) {
-            console.log(playlistToVibe[environment][timeOfDay])
+    
+            console.log(playlistToVibe[environment][timeOfDay]);
+    
             const { data } = await axios.get("https://api.spotify.com/v1/search", {
+    
               headers: {
+    
                 Authorization: `Bearer ${token}`,
+    
               },
+    
               params: {
+    
                 q: playlistToVibe[environment][timeOfDay],
+    
                 type: "playlist",
+    
               },
+    
             });
+    
             searchTracks(data.playlists.items[0].href, environment, timeOfDay);
+    
           }
+    
         }
+    
       };
 
   return (
     <>
-      <h1 className="title">VibeS</h1>
+      <div className="top-bar"> 
+        <h1 className="title"> VibeS</h1>
+        {!token ? (
+          <a
+            href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
+          >
+            Login to Spotify
+          </a>
+        ) : (
+          <button onClick={logout}>Logout</button>
+        )}
+
+      </div>
       <div className="App">
         <ImageSlider images={shuffleimage} />
-        <div className="absolute top-0 left-0 w-full h-screen flex items-center justify-center text-white">
-          <h1 className="text-4xl font-bold"> Make a playlist for any </h1>
+        <div className="absolute top-0 left-0 w-full h-screen flex items-center justify-center text-white -z-10">
+          <h1 className="text-4xl font-bold "> Make a playlist for any </h1>
           <h1 className="title">
             <span className="text-4xl font-bold" style={{ color: '#E63946' }}>V</span>
             <span className="text-4xl font-bold" style={{ color: '#FFD700' }}>i</span>
@@ -231,6 +355,10 @@ function App() {
             <span className="text-4xl font-bold" style={{ color: '#1D3557' }}>S</span>
           </h1>
         </div>
+        <form onSubmit={searchPlaylist}>
+          {/* <input type="text" onChange={(e) => setSearchKey(e.target.value)} /> */}
+          <button type={"submit"}>Begin Table Population</button>
+        </form>
         <div className="upload-btn-wrapper" color={isLightMode ? 'black' : 'white'}> 
           <button class="btn1">{imageUploaded ?  imageName: "Upload a file"}</button>
           <input type='file' name='image' onChange={(e) => {
@@ -252,19 +380,6 @@ function App() {
             color= {isLightMode ? 'black' : 'white'}
           />
         </div>
-        {!token ? (
-        <a
-          href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
-        >
-          Login to Spotify
-        </a>
-      ) : (
-        <button onClick={logout}>Logout</button>
-      )}
-      <form onSubmit={searchPlaylist}>
-        {/* <input type="text" onChange={(e) => setSearchKey(e.target.value)} /> */}
-        <button type={"submit"}>Begin Table Population</button>
-      </form>
       </div>
     </>
   );

@@ -12,13 +12,13 @@ const ImageSlider = ({ images }) => {
   }, [currentIndex, images]);
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative h-screen overflow-hidden -z-10">
       {images.map((image, index) => (
         <img
           key={index}
           src={image}
           alt={`Image ${index}`}
-          className={`absolute w-full h-full transform ${
+          className={`absolute w-full h-full transform -z-10 ${
             index === currentIndex ? 'translate-y-0' : 'translate-y-full'
           } transition-transform duration-1000`}
         />

@@ -127,8 +127,15 @@
     background-color: #1DB954; /* Change to the desired color on hover */
   }
   
+  .top-bar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-right: 10px;
+    z-index: 10;
+  }
 
-  
+
   .upload-btn-wrapper input[type=file] {
     font-size: 100px;
     position: absolute;
