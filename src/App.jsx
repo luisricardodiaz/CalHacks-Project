@@ -258,15 +258,17 @@ function App() {
   return (
     <>
       <div className="top-bar">
-        <h1 className="title"> VibeS</h1>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="animate-charcter">VibeS</h3>
+            </div>
+          </div>
         {!token ? (
-          <a
-            href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}
-          >
+          <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`} className="spotify-login">
             Login to Spotify
           </a>
         ) : (
-          <button onClick={logout}>Logout</button>
+          <button className='spotify-login' onClick={logout}>Logout</button>
         )}
       </div>
       <div className="App">
