@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-
+import './playlist.css';
 function SpotifyPlaylist({ tableName, environmentLabel, timeOfDayLabel }) {
     const recommendedSongs = useQuery(api.mySongs.get, {tableName: tableName, environment: environmentLabel, timeOfDay: timeOfDayLabel})
     if (recommendedSongs === undefined || recommendedSongs.length == 0) {
@@ -9,28 +9,31 @@ function SpotifyPlaylist({ tableName, environmentLabel, timeOfDayLabel }) {
     }
     const playlist = getPlaylist(recommendedSongs);
     return (
-      (<div>
+      (<div className="playlist-container" >
         {/* <button
           onClick={() => createPlaylist({ playlistArray })}>
           Create Playlist
         </button> */}
         <table>
           <thead>
-            <tr>
+            <tr className="title-align playlist-title">
               <th>#</th>
               <th>Title</th>
               <th>Album</th>
-              <th>Artist(s)</th>
               <th>Duration</th>
             </tr>
           </thead>
-          <tbody>  
+          <tbody className="table-body">  
          {playlist.map((song,index )=> {
                         return <tr key={index}>
                           <td>{index + 1}</td>
-                          <td>{song.track.name}</td>
-                          <td>{song.track.album.name}</td>
-                          <td>{getArtists(song.track.artists)}</td>
+                          <td className="title-align">
+                            <ul>
+                              <li>{song.track.name}</li>
+                              <li>{getArtists(song.track.artists)}</li>
+                            </ul>
+                          </td>
+                            <td className="title-align">{song.track.album.name}</td>
                           <td>{msToMinutesAndSeconds(song.track.duration_ms)}</td>
                           </tr>;
                     })} 

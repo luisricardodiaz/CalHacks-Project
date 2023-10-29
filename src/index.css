@@ -40,10 +40,16 @@
 
     font-size: 22px;
   }
-
-  a {
-    color: var(--convex-yellow);
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
   }
+  /* a {
+    color: var(--convex-yellow);
+  } */
 
   .title{
     margin-left: 1%;
