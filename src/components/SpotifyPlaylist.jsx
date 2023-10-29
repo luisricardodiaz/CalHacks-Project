@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
-function SpotifyPlaylist({ tableName, generatePlaylistClicked, timeOfDayLabel, environmentLabel }) {
-    const mySongs = useQuery(api.mySongs.get, {tableName: tableName, environment: environmentLabel, timeOfDay: timeOfDayLabel})
-    if (generatePlaylistClicked == false) {
+function SpotifyPlaylist({ tableName, environmentLabel, timeOfDayLabel }) {
+    const recommendedSongs = useQuery(api.mySongs.get, {tableName: tableName, environment: environmentLabel, timeOfDay: timeOfDayLabel})
+    if (recommendedSongs === undefined || recommendedSongs.length == 0) {
         return (<div></div>)
     }
-    const playlist = getPlaylist(mySongs);
+    const playlist = getPlaylist(recommendedSongs);
     return (
       (<div>
         {/* <button

@@ -56,92 +56,9 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
   const [imageName, setImageName] = useState("");
 
-  useEffect(() => {
-    async function asyncWrapper() {
-      if (imageUploaded == false) {
-        return;
-      } // React.StrictMode in main.jsx makes this code run twice
-      async function scenesQuery(filename) {
-        const data = await (await fetch(filename)).arrayBuffer();
-        const response = await fetch(
-          "https://api-inference.huggingface.co/models/jmillan736/BEiT-Scenes",
-          {
-            headers: {
-              Authorization: `Bearer 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`,
-            },
-            method: "POST",
-            body: data,
-          }
-        );
-        const result = await response.json();
-        if ("error" in result) {
-          throw new Error("API Call failed! " + result.error);
-        }
-        return result;
-      }
-
-      async function timeQuery(filename) {
-        const data = await (await fetch(filename)).arrayBuffer();
-        const response = await fetch(
-          "https://api-inference.huggingface.co/models/jmillan736/BEiT-Time-Of-Day",
-          {
-            headers: {
-              Authorization: `Bearer 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`,
-            },
-            method: "POST",
-            body: data,
-          }
-        );
-        const result = await response.json();
-        if ("error" in result) {
-          throw new Error("API Call failed! " + result.error);
-        }
-        return result;
-      }
-
-      async function callQuery(maxRetries, query) {
-        if (maxRetries > 8) {
-          alert("API Call failed, please try again")
-          throw new Error("Maximum number of API Calls exceeded");
-        }
-        try {
-          const answer = await query(imageUrl);
-          alert("query " + query + " succeeded")
-          return answer;
-        } catch (error) {
-          setTimeout(() => {
-            console.log(error + " Retrying...");
-          }, 1000);
-          await callQuery(maxRetries + 1, query);
-        }
-      }
-
-      const environment = await callQuery(0, scenesQuery);
-      const timeOfDay = await callQuery(0, timeQuery);
-
-      setTimeOfDayLabel(timeOfDay[0].label);
-      setEnvironmentLabel(environment[0].label);
-
-      // const mySongs = useQuery(api.mySongs.get, {tableName: uniqueId, environment: environment[0].label, timeOfDay: timeOfDay[0].label})
-
-      // const highestTimeMatch = timeOutput[0].label;
-      // const playlistOptions = Array.from(labelToSongs[highestTimeMatch]);
-
-      // console.log(playlist);
-    }
-    asyncWrapper()
-      .then(() => {})
-      .catch((error) => console.log("asyncwrapper FAILED: " + error));
-  }, [imageUploaded, imageUrl]);
-
   const [playlistOptions, setPlaylistOptions] = useState([])
   const [timeOfDayLabel, setTimeOfDayLabel] = useState("")
   const [environmentLabel, setEnvironmentLabel] = useState("")
-  const [generatePlaylistClicked, setGeneratePlaylistClicked] = useState("");
-
-  const morningSongs = useQuery(api.morningSongs.get);
-  const daySongs = useQuery(api.daySongs.get);
-  const nightSongs = useQuery(api.nightSongs.get);
 
   // three labels: Sunrise, Daytime, Nighttime
   // TODO: these labels are undefined at first, I'm not sure why
@@ -152,11 +69,71 @@ function App() {
   // };
 
   const handleGeneratePlaylistClick = async () => {
-    if (timeOfDayLabel == "" || environmentLabel == "") {
-      alert("Playlist generation failed! Please try again.")
-      throw new Error("Playlist generation failed! Please try again.")
+    if (imageUrl == "") {
+      alert("No image found! Did you upload an image?")
     }
-    setGeneratePlaylistClicked(true)
+    async function scenesQuery(filename) {
+      const data = await (await fetch(filename)).arrayBuffer();
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/jmillan736/BEiT-Scenes",
+        {
+          headers: {
+            Authorization: `Bearer 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`,
+          },
+          method: "POST",
+          body: data,
+        }
+      );
+      const result = await response.json();
+      if ("error" in result) {
+        throw new Error("Environment Model Call failed! " + result.error);
+      }
+      return result;
+    }
+
+    async function timeQuery(filename) {
+      const data = await (await fetch(filename)).arrayBuffer();
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/jmillan736/BEiT-Time-Of-Day",
+        {
+          headers: {
+            Authorization: `Bearer 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`,
+          },
+          method: "POST",
+          body: data,
+        }
+      );
+      const result = await response.json();
+      if ("error" in result) {
+        throw new Error("Time Of Day Model Call failed! " + result.error);
+      }
+      return result;
+    }
+
+    async function callQuery(maxRetries, query) {
+      if (maxRetries > 5) {
+        alert("API Call failed, please try again")
+        throw new Error("Maximum number of API Calls exceeded");
+      }
+      try {
+        const answer = await query(imageUrl);
+        return answer;
+      } catch (error) {
+        setTimeout(() => {
+          console.log(error + " Retrying...");
+        }, 2000);
+        await callQuery(maxRetries + 1, query);
+      }
+    }
+
+    const environment = await callQuery(0, scenesQuery);
+    const timeOfDay = await callQuery(0, timeQuery);
+
+    console.log("Environment Labels: " + JSON.stringify(environment))
+    console.log("Time of day labels: " + JSON.stringify(timeOfDay))
+
+    setTimeOfDayLabel(timeOfDay[0].label);
+    setEnvironmentLabel(environment[0].label);
   };
 
   function isBackgroundColorWhite(element) {
@@ -359,8 +336,8 @@ function App() {
             color={isLightMode ? "black" : "white"}
           />
         </div>
-        <SpotifyPlaylist tableName={uniqueId} generatePlaylistClicked={generatePlaylistClicked} 
-        timeOfDayLabel={timeOfDayLabel} environmentLabel={environmentLabel}/>
+        <SpotifyPlaylist tableName={uniqueId}
+        environmentLabel={environmentLabel} timeOfDayLabel={timeOfDayLabel}/>
       </div>
     </>
   );
